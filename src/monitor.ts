@@ -15,7 +15,7 @@ setInterval(() => {
     }
 
     const app = list[0];
-    const cpuUsage = app.monit.cpu;
+    const cpuUsage = app.monit?.cpu;
 
     // Añadir el uso actual de CPU al historial
     cpuUsageHistory.push({
