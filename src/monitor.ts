@@ -1,4 +1,4 @@
-import pm2 from 'pm2';
+import * as pm2 from 'pm2';
 
 const appName = 'FabricatermosChabot'; // Reemplaza con el nombre de tu aplicación en PM2
 const maxCpuUsage = 90; // Umbral de uso de CPU en porcentaje
@@ -15,19 +15,21 @@ setInterval(() => {
     }
 
     const app = list[0];
-    const cpuUsage = app.monit?.cpu;
+    const cpuUsage = app?.monit?.cpu; // Corrige el acceso a app.monit.cpu
 
     // Añadir el uso actual de CPU al historial
     cpuUsageHistory.push({
       time: Date.now(),
-      usage: cpuUsage,
+      usage: cpuUsage || 0, // Asegúrate de manejar el caso donde cpuUsage pueda ser undefined
     });
 
     // Filtrar el historial para mantener solo los registros dentro de la duración máxima
     cpuUsageHistory = cpuUsageHistory.filter(entry => entry.time > Date.now() - maxDuration);
 
     // Calcular el uso promedio de CPU en el historial
-    const avgCpuUsage = cpuUsageHistory.reduce((acc, entry) => acc + entry.usage, 0) / cpuUsageHistory.length;
+    const avgCpuUsage = cpuUsageHistory.length > 0 ?
+      cpuUsageHistory.reduce((acc, entry) => acc + (entry.usage || 0), 0) / cpuUsageHistory.length :
+      0; // Asegúrate de manejar el caso donde cpuUsageHistory.length podría ser 0
 
     if (avgCpuUsage > maxCpuUsage) {
       console.log(`CPU usage average is ${avgCpuUsage}%, restarting ${appName}...`);
